@@ -8,6 +8,8 @@ local LXR = exports['lxr-core']:GetLXR()
 local C = LXRCraft
 local RES = GetCurrentResourceName()
 local books, queues, buckets = {}, {}, {}   -- cid → { xp = { trade = n }, specials = {} } ; src → running queue
+local dynamic = {}   -- stations other resources add at runtime (a camp's fire): id → { id, kind, label, coords }
+local function station(id) return C.Station(id) or dynamic[id] end
 
 local function limited(src)
     local b = buckets[src]
@@ -75,7 +77,7 @@ LXR.RPC.Register('lxr-craft:open', function(src, stationId)
     local P = player(src)
     if not P then return false, 'invalid' end
     if stationId then
-        local st = C.Station(stationId)
+        local st = station(stationId)
         if not st then return false, 'invalid' end
         if not near(src, st.coords) then return false, 'too_far' end
         return true, view(src, st.kind, st)
@@ -122,7 +124,7 @@ LXR.RPC.Register('lxr-craft:start', function(src, stationId, recipeId, times)
     local P, r = player(src), C.Recipe(recipeId)
     if not P or not r then return false, 'invalid' end
     if queues[src] then return false, 'busy' end
-    local st = stationId and C.Station(stationId) or nil
+    local st = stationId and station(stationId) or nil
     if r.kind ~= 'hands' then
         if not st or st.kind ~= r.kind then return false, 'wrong_station' end
         if not near(src, st.coords) then return false, 'too_far' end
@@ -171,6 +173,8 @@ end)
 AddEventHandler('playerDropped', function() queues[source] = nil buckets[source] = nil local P = player(source) if P then saveBook(P.PlayerData.citizenid) end end)
 AddEventHandler('lxr:character:deleted', function(_, cid) books[cid] = nil end)
 
+exports('AddStation', function(id, kind, label, coords) if not Config.Kinds[kind] then return false end dynamic[id] = { id = id, kind = kind, label = label, coords = coords } return true end)
+exports('RemoveStation', function(id) dynamic[id] = nil end)
 exports('Level', function(cid, trade) return C.Level(trade, book(cid).xp[trade] or 0) end)
 exports('AddXP', function(cid, trade, n) local b = book(cid) if not Config.Trades[trade] then return false end b.xp[trade] = (b.xp[trade] or 0) + (tonumber(n) or 0) b.dirty = true return true end)
 exports('Specials', function(cid) return book(cid).specials end)

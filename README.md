@@ -17,7 +17,7 @@ and the ledger of who made what.
 * **Stations** — `Config.Stations` points through lxr-interact; `/craft` opens the by-hand book anywhere.
 * **The book** — filter by what you can make now, search, each recipe with have/need per ingredient, the tool, time, level, XP; make 1–N in a queue the server times (inputs taken per unit; walking away or running short stops it).
 * **Trades** — levels from an XP curve (`Config.Levels`), progress bars, level-up notices; **mastery** (`Config.Specialisation`): choose `slots` trades, change for a price.
-* **Events** — `lxr:craft:made (src, recipe, trade, xp)`; exports `Level`, `AddXP`, `Specials` for other resources (a hunter's skinning, a farmer's harvest) to feed the trades.
+* **Events** — `lxr:craft:made (src, recipe, trade, xp)`; exports `Level`, `AddXP`, `Specials`, and `AddStation(id, kind, label, coords)` / `RemoveStation(id)` for resources that put stations in the world (a camp's fire is a campfire station; the client opens it with `lxr-craft:client:openAt`) — for other resources (a hunter's skinning, a farmer's harvest) to feed the trades.
 * **Not verified in game** — station scenario names in `Config.Kinds`; a bad name plays nothing.
 
 ## Install

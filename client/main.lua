@@ -62,6 +62,8 @@ CreateThread(function()
     end
 end)
 RegisterCommand(Config.Command.name, function() if LocalPlayer.state.isLoggedIn and not working then openBook(nil) end end, false)
+-- another resource's station (a camp's fire): it registered the station on the server, this opens the book at it
+RegisterNetEvent('lxr-craft:client:openAt', function(id, kind, label) if not working then openBook({ id = id, kind = kind, label = label }) end end)
 RegisterNetEvent('lxr:client:unloaded', function() close() end)
 AddEventHandler('onResourceStop', function(res) if res == GetCurrentResourceName() then close() for _, s in ipairs(Config.Stations) do exports['lxr-interact']:Remove('lxr-craft:' .. s.id) end end end)
 exports('IsWorking', function() return working end)
